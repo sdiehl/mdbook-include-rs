@@ -1,4 +1,4 @@
-# mdbook-include-doc
+# mdbook-include-rs
 
 A powerful preprocessor for [mdBook](https://rust-lang.github.io/mdBook/) that lets you include code from external source files with intelligent extraction capabilities. This makes it easy to maintain accurate code examples that are always in sync with your actual codebase.
 
@@ -132,9 +132,6 @@ mdbook-include-doc pre-process <path-to-book>
 
 ## License
 
-This project is licensed under either:
+This project is licensed under:
 
-- MIT license
 - Apache License, Version 2.0
-
-at your option.
