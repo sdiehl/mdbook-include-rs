@@ -2,8 +2,8 @@ use insta::assert_snapshot;
 use mdbook::Config;
 use mdbook::book::{Book, BookItem, Chapter};
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
-use mdbook_include_doc::IncludeDocPreprocessor;
 use std::path::PathBuf;
+use mdbook_include_rs::IncludeDocPreprocessor;
 
 #[test]
 fn test_empty_preprocessor() {
@@ -46,7 +46,7 @@ fn test_source_file_preprocessor() {
     let mut book = Book::new();
     let chapter = Chapter {
         name: "Chapter 1".to_string(),
-        content: "Some preamble\n```rust\n{{#source_file!(\"../test_file.rs\")}}\n```\n after"
+        content: "Some preamble\n```rust\n#![source_file!(\"../test_file.rs\")]\n```\n after"
             .to_string(),
         number: None,
         sub_items: vec![],
@@ -85,7 +85,7 @@ fn test_function_body_preprocessor() {
     let chapter = Chapter {
         name: "Chapter 1".to_string(),
         content:
-            "some preamble\n```rust\n{{ #function_body!(\"../test_file.rs\", hello_world) }}\n```\n after"
+            "some preamble\n```rust\n#![function_body!(\"../test_file.rs\", hello_world)]\n```\n after"
                 .to_string(),
         number: None,
         sub_items: vec![],
@@ -124,7 +124,7 @@ fn test_complex_function_body_preprocessor() {
     let chapter = Chapter {
         name: "Chapter 1".to_string(),
         content:
-            "some preamble\n```rust\n{{ #function_body!(\"../test_file.rs\", TestStruct::print, [struct TestStruct, impl TestStruct::new, trait TestTrait, impl TestTrait for TestStruct]) }}\n```\n after"
+            "some preamble\n```rust\n#![function_body!(\"../test_file.rs\", TestStruct::print, [struct TestStruct, impl TestStruct::new, trait TestTrait, impl TestTrait for TestStruct])]\n```\n after"
                 .to_string(),
         number: None,
         sub_items: vec![],
@@ -162,7 +162,7 @@ fn test_relative_path_with_source_path() {
     let mut book = Book::new();
     let chapter = Chapter {
         name: "Relative Path Test".to_string(),
-        content: "```rust\n{{ #source_file!(\"../test_file.rs\") }}\n```".to_string(),
+        content: "```rust\n#![source_file!(\"../test_file.rs\")]\n```".to_string(),
         number: None,
         sub_items: vec![],
         path: Some(PathBuf::from("relative_test.md")),

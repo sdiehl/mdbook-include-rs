@@ -4,8 +4,7 @@ use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
 use std::io;
 use std::path::PathBuf;
 use std::process;
-
-use mdbook_include_doc::IncludeDocPreprocessor;
+use mdbook_include_rs::IncludeDocPreprocessor;
 
 /// An mdBook preprocessor that integrates with include-doc to render external source files
 #[derive(Parser)]

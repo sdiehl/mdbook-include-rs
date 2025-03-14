@@ -1,10 +1,10 @@
 [package]
-name = "mdbook-include-doc"
+name = "mdbook-include-rs"
 version = "0.1.0"
-description = "An mdBook preprocessor that integrates with include-doc to render external source files"
+description = "An mdBook preprocessor that includes external Rust source files"
 edition = "2024"
 license = "MIT OR Apache-2.0"
-repository = "https://github.com/bryncooke/mdbook-include-doc"
+repository = "https://github.com/bryncooke/mdbook-include-rs"
 readme = "README.md"
 keywords = ["mdbook", "preprocessor", "include", "doc", "syntax"]
 categories = ["command-line-utilities", "development-tools"]

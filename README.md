@@ -42,7 +42,7 @@ To include an entire source file:
 
 ````markdown
 ```rust
-{{#source_file!("examples/my_example.rs")}}
+#![source_file!("source_file.rs")]
 ```
 ````
 
@@ -54,7 +54,7 @@ To include just the body of a specific function (without the function declaratio
 
 ````markdown
 ```rust
-{{#function_body!("src/lib.rs", process_data)}}
+#![function_body!("source_file.rs", hello_world)]
 ```
 ````
 
@@ -66,7 +66,7 @@ If your function depends on other types or functions, you can include them too:
 
 ````markdown
 ```rust
-{{#function_body!("src/models.rs", User::display_profile, [struct User, trait Displayable, impl Displayable for User])}}
+#![function_body!("src/models.rs", User::display_profile, [struct User, trait Displayable, impl Displayable for User])]
 ```
 ````
 

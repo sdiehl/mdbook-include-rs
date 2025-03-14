@@ -6,12 +6,12 @@ use std::fs;
 use std::path::Path;
 use toml::Value;
 
-/// Preprocessor that handles include-doc code blocks
+/// Preprocessor that handles include-rs code blocks
 pub struct IncludeDocPreprocessor;
 
 impl Preprocessor for IncludeDocPreprocessor {
     fn name(&self) -> &str {
-        "include-doc"
+        "include-rs"
     }
 
     fn run(&self, ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
@@ -27,6 +27,8 @@ impl Preprocessor for IncludeDocPreprocessor {
             None
         };
 
+        let src_dir = ctx.root.join("src");
+
         book.for_each_mut(|item| {
             if let BookItem::Chapter(chapter) = item {
                 // Get the directory of the chapter markdown file to use as the base if no global base_dir
@@ -34,17 +36,15 @@ impl Preprocessor for IncludeDocPreprocessor {
                     global_dir.clone()
                 } else if let Some(ref source_path) = chapter.source_path {
                     // The SUMMARY.md file is always in src
-
                     // Use the directory containing the markdown file as base
                     if let Some(parent) = source_path.parent() {
-                        ctx.root.join(parent)
+                        src_dir.join(parent)
                     } else {
-                        ctx.root.clone()
+                        src_dir.clone()
                     }
-                    .join("src")
                 } else {
                     // Fallback to root if no source path
-                    ctx.root.clone()
+                    src_dir.clone()
                 };
 
                 if let Err(e) = process_markdown(&base_dir, &mut chapter.content) {
@@ -65,7 +65,7 @@ impl Preprocessor for IncludeDocPreprocessor {
 /// Process the markdown content to find and replace include-doc code blocks
 pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
     // This regex finds our directives anywhere in the content
-    let re = Regex::new(r"\{\{[\s]*(#(?:source_file|function_body)![\s\S]*?)[\s]*\}\}")?;
+    let re = Regex::new(r"(?ms)^#!\[((?:source_file|function_body)![\s\S]*?)\]$")?;
 
     let result = re.replace_all(content, |caps: &Captures| {
         let include_doc_directive = caps.get(1).map_or("", |m| m.as_str());
@@ -87,9 +87,9 @@ pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
 /// Process an include-doc directive
 fn process_include_doc_directive(base_dir: &Path, directive: &str) -> Result<String> {
     // Find if it's a source_file or function_body directive
-    if directive.starts_with("#source_file!") {
+    if directive.starts_with("source_file!") {
         process_source_file_directive(base_dir, directive)
-    } else if directive.starts_with("#function_body!") {
+    } else if directive.starts_with("function_body!") {
         process_function_body_directive(base_dir, directive)
     } else {
         // Pass through unchanged if not recognized
@@ -102,7 +102,7 @@ fn process_source_file_directive(base_dir: &Path, directive: &str) -> Result<Str
     // Extract the file path from the directive
     // The pattern is: #source_file!("path/to/file.rs")
     // Using (?s) to enable DOTALL mode for handling multi-line input
-    let re = Regex::new(r#"(?s)#source_file!\s*\(\s*"([^"]+)"\s*\)"#)?;
+    let re = Regex::new(r#"(?s)source_file!\s*\(\s*"([^"]+)"\s*\)"#)?;
 
     if let Some(caps) = re.captures(directive) {
         let file_path = caps.get(1).map_or("", |m| m.as_str());
@@ -142,7 +142,7 @@ fn process_function_body_directive(base_dir: &Path, directive: &str) -> Result<S
     // The pattern is: #function_body!("path/to/file.rs", function_name, [optional, dependencies])
     // Using (?s) to enable DOTALL mode for handling multi-line input
     let re = Regex::new(
-        r#"(?s)#function_body!\s*\(\s*"([^"]+)"\s*,\s*([^,\]]+)(?:\s*,\s*\[(.*?)\])?\s*\)"#,
+        r#"(?s)function_body!\s*\(\s*"([^"]+)"\s*,\s*([^,\]]+)(?:\s*,\s*\[(.*?)])?\s*\)"#,
     )?;
 
     if let Some(caps) = re.captures(directive) {
@@ -151,7 +151,9 @@ fn process_function_body_directive(base_dir: &Path, directive: &str) -> Result<S
         let dependencies = caps.get(3).map(|m| m.as_str().trim());
 
         let absolute_path = base_dir.join(file_path);
-
+        eprintln!("base_dir: {:?}", base_dir);
+        eprintln!("file_path: {:?}", file_path);
+        eprintln!("absolute_path: {:?}", absolute_path);
         // Check if file exists
         if !absolute_path.exists() {
             return Err(anyhow::anyhow!(
