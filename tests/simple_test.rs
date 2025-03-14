@@ -2,8 +2,8 @@ use insta::assert_snapshot;
 use mdbook::Config;
 use mdbook::book::{Book, BookItem, Chapter};
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
-use std::path::PathBuf;
 use mdbook_include_rs::IncludeDocPreprocessor;
+use std::path::PathBuf;
 
 #[test]
 fn test_empty_preprocessor() {

@@ -1,7 +1,7 @@
 use mdbook::MDBook;
+use mdbook_include_rs::IncludeDocPreprocessor;
 use std::fs;
 use std::path::Path;
-use mdbook_include_rs::IncludeDocPreprocessor;
 
 #[test]
 fn test_preprocessor_with_complete_mdbook() {
