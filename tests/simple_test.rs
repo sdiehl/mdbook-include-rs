@@ -190,8 +190,10 @@ fn test_relative_path_with_source_path() {
     }
 
     // Should contain the struct definition from test_file.rs
-    assert!(processed_content.contains("struct TestStruct"), 
-            "Output doesn't contain expected content from test_file.rs");
+    assert!(
+        processed_content.contains("struct TestStruct"),
+        "Output doesn't contain expected content from test_file.rs"
+    );
 }
 
 // Create a mock PreprocessorContext for testing

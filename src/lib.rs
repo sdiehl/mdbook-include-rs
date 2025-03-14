@@ -27,7 +27,6 @@ impl Preprocessor for IncludeDocPreprocessor {
             None
         };
 
-
         book.for_each_mut(|item| {
             if let BookItem::Chapter(chapter) = item {
                 // Get the directory of the chapter markdown file to use as the base if no global base_dir
@@ -41,7 +40,8 @@ impl Preprocessor for IncludeDocPreprocessor {
                         ctx.root.join(parent)
                     } else {
                         ctx.root.clone()
-                    }.join("src")
+                    }
+                    .join("src")
                 } else {
                     // Fallback to root if no source path
                     ctx.root.clone()
