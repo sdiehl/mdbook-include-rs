@@ -1,6 +1,6 @@
 # mdbook-include-rs
 
-A powerful preprocessor for [mdBook](https://rust-lang.github.io/mdBook/) that lets you include code from external source files with intelligent extraction capabilities. This makes it easy to maintain accurate code examples that are always in sync with your actual codebase.
+A preprocessor for [mdBook](https://rust-lang.github.io/mdBook/) that lets you include code from external Rust source files with extraction capabilities. This makes it easy to maintain code examples that are always in sync with your actual codebase.
 
 ## Features
 
@@ -15,10 +15,10 @@ A powerful preprocessor for [mdBook](https://rust-lang.github.io/mdBook/) that l
 First, install the preprocessor:
 
 ```bash
-cargo install mdbook-include-doc
+cargo install mdbook-include-rs
 ```
 
-Then, add it to your mdBook dependencies. In your book's directory, make sure to modify your `book.toml` file:
+Then, modify your `book.toml` file:
 
 ```toml
 [book]
@@ -26,11 +26,11 @@ title = "My Book"
 authors = ["Your Name"]
 
 # Add the preprocessor to your mdBook
-[preprocessor.include-doc]
+[preprocessor.include-rs]
 
 # Optional: Specify a base directory for all file paths
 # If not provided, paths will be relative to each markdown file's directory
-# [preprocessor.include-doc]
+# [preprocessor.include-rs]
 # base-dir = "examples"
 ```
 
