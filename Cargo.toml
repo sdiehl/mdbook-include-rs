@@ -22,3 +22,5 @@ toml = "0.5"
 
 [dev-dependencies]
 insta = "1.39.0"
+tempfile = "3.10.1"
+mdbook = "0.4.47"

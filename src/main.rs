@@ -12,7 +12,7 @@ use mdbook_include_doc::IncludeDocPreprocessor;
 #[command(author, version, about)]
 struct Cli {
     #[command(subcommand)]
-    command: Commands,
+    command: Option<Commands>,
 }
 
 #[derive(Subcommand)]
@@ -36,14 +36,15 @@ fn main() -> Result<()> {
     let preprocessor = IncludeDocPreprocessor;
 
     match args.command {
-        Commands::Supports { renderer } => {
+        Some(Commands::Supports { renderer }) => {
             if preprocessor.supports_renderer(&renderer) {
                 process::exit(0);
             } else {
                 process::exit(1);
             }
         }
-        Commands::PreProcess { dir: _ } => {
+        Some(Commands::PreProcess { dir: _ }) | None => {
+            // Default behavior is to preprocess
             // Read the book from stdin instead of directly from the filesystem
             let (ctx, book) = CmdPreprocessor::parse_input(io::stdin())?;
 

@@ -28,7 +28,8 @@ authors = ["Your Name"]
 # Add the preprocessor to your mdBook
 [preprocessor.include-doc]
 
-# Optional: Specify a base directory for relative file paths
+# Optional: Specify a base directory for all file paths
+# If not provided, paths will be relative to each markdown file's directory
 # [preprocessor.include-doc]
 # base-dir = "examples"
 ```

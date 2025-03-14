@@ -15,18 +15,38 @@ impl Preprocessor for IncludeDocPreprocessor {
     }
 
     fn run(&self, ctx: &PreprocessorContext, mut book: Book) -> Result<Book> {
-        let base_dir = if let Some(config) = ctx.config.get_preprocessor(self.name()) {
+        let config_section = ctx.config.get_preprocessor(self.name());
+        // Get global base_dir from config if provided, otherwise set to None
+        let global_base_dir = if let Some(config) = config_section {
             if let Some(Value::String(dir)) = config.get("base-dir") {
-                ctx.root.join(dir)
+                Some(ctx.root.join(dir))
             } else {
-                ctx.root.clone()
+                None
             }
         } else {
-            ctx.root.clone()
+            None
         };
+
 
         book.for_each_mut(|item| {
             if let BookItem::Chapter(chapter) = item {
+                // Get the directory of the chapter markdown file to use as the base if no global base_dir
+                let base_dir = if let Some(ref global_dir) = global_base_dir {
+                    global_dir.clone()
+                } else if let Some(ref source_path) = chapter.source_path {
+                    // The SUMMARY.md file is always in src
+
+                    // Use the directory containing the markdown file as base
+                    if let Some(parent) = source_path.parent() {
+                        ctx.root.join(parent)
+                    } else {
+                        ctx.root.clone()
+                    }.join("src")
+                } else {
+                    // Fallback to root if no source path
+                    ctx.root.clone()
+                };
+
                 if let Err(e) = process_markdown(&base_dir, &mut chapter.content) {
                     eprintln!("Error processing chapter '{}': {}", chapter.name, e);
                 }

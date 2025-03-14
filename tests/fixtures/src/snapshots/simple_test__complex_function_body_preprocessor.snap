@@ -1,0 +1,36 @@
+---
+source: tests/simple_test.rs
+expression: processed_content
+---
+some preamble
+```rust
+struct TestStruct {
+    name: String,
+    value: i32,
+}
+
+impl TestStruct {
+    fn new(name: &str, value: i32) -> Self {
+        Self {
+            name: name.to_string(),
+            value,
+        }
+    }
+}
+
+trait TestTrait {
+    fn test_method(&self) -> String;
+    fn default_method(&self) -> i32 {
+        42
+    }
+}
+
+impl TestTrait for TestStruct {
+    fn test_method(&self) -> String {
+        format!("TestStruct: {}", self.name)
+    }
+}
+
+println!("Name: {}, Value: {}", self.name, self.value);
+```
+ after

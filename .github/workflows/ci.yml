@@ -35,10 +35,7 @@ jobs:
     
     - name: Run tests
       run: cargo test --verbose
-    
-    - name: Run insta tests
-      run: cargo insta test --accept
-  
+
   lint:
     name: Lint
     runs-on: ubuntu-latest
