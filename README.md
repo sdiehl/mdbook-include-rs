@@ -83,6 +83,7 @@ The dependencies will be included in the order you list them, with the main func
 You can include various types of dependencies:
 
 - `struct StructName` - includes a struct definition
+- `enum EnumName` - includes an enum definition
 - `trait TraitName` - includes a trait definition
 - `impl StructName` - includes all methods in an impl block for a struct
 - `impl StructName::method_name` - includes a specific method from an impl block

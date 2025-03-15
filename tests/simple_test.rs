@@ -157,6 +157,49 @@ fn test_complex_function_body_preprocessor() {
 }
 
 #[test]
+fn test_enum_dependency() {
+    // Create a book with a chapter containing function_body directive that depends on an enum
+    let mut book = Book::new();
+    let chapter = Chapter {
+        name: "Chapter 1".to_string(),
+        content:
+            "some preamble\n```rust\n#![function_body!(\"../test_file.rs\", hello_world, [enum TestEnum])]\n```\n after"
+                .to_string(),
+        number: None,
+        sub_items: vec![],
+        path: Some(PathBuf::from("chapter_1.md")),
+        source_path: Some(PathBuf::from("chapter_1.md")),
+        parent_names: vec![],
+    };
+    book.push_item(BookItem::Chapter(chapter));
+
+    // Create a preprocessor context
+    let ctx = create_test_context();
+
+    // Run the preprocessor
+    let preprocessor = IncludeDocPreprocessor;
+    let processed_book = preprocessor.run(&ctx, book).unwrap();
+
+    // Extract the processed content for snapshot testing
+    let mut processed_content = String::new();
+    for item in processed_book.iter() {
+        if let BookItem::Chapter(chapter) = item {
+            if chapter.name == "Chapter 1" {
+                processed_content = chapter.content.clone();
+                break;
+            }
+        }
+    }
+
+    // The processed content should contain the enum definition and function body
+    assert!(processed_content.contains("enum TestEnum"));
+    assert!(processed_content.contains("A,"));
+    assert!(processed_content.contains("B(i32)"));
+    assert!(processed_content.contains("C { name: String }"));
+    assert!(processed_content.contains("println!(\"Hello, world!\")"));
+}
+
+#[test]
 fn test_relative_path_with_source_path() {
     // Create a book with a chapter containing a relative path
     let mut book = Book::new();

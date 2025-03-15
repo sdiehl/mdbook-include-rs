@@ -338,6 +338,17 @@ fn extract_function_with_dependencies(
                 return Err(anyhow::anyhow!("Struct '{}' not found", struct_name));
             }
         }
+        // Check if it's an enum dependency
+        else if dep.starts_with("enum ") {
+            let enum_name = dep.trim_start_matches("enum ").trim();
+            let mut enum_code = String::new();
+
+            if find_enum(&syntax, enum_name, &mut enum_code) {
+                dependency_blocks.push((format!("enum {}", enum_name), enum_code));
+            } else {
+                return Err(anyhow::anyhow!("Enum '{}' not found", enum_name));
+            }
+        }
         // Check if it's a trait dependency
         else if dep.starts_with("trait ") {
             let trait_name = dep.trim_start_matches("trait ").trim();
@@ -542,6 +553,25 @@ fn find_struct(syntax: &syn::File, name: &str, output: &mut String) -> bool {
 
                 // Remove trailing newlines to ensure consistent formatting
                 *output = struct_code.trim_end().to_string();
+                return true;
+            }
+        }
+    }
+    false
+}
+
+fn find_enum(syntax: &syn::File, name: &str, output: &mut String) -> bool {
+    for item in &syntax.items {
+        if let syn::Item::Enum(item_enum) = item {
+            if item_enum.ident == name {
+                let enum_code = prettyplease::unparse(&syn::File {
+                    shebang: None,
+                    attrs: vec![],
+                    items: vec![syn::Item::Enum(item_enum.clone())],
+                });
+
+                // Remove trailing newlines to ensure consistent formatting
+                *output = enum_code.trim_end().to_string();
                 return true;
             }
         }
