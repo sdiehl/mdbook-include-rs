@@ -1,0 +1,14 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+enum preamble
+```rust
+#use std::fmt;
+enum TestEnum {
+    A,
+    B(i32),
+    C { name: String },
+}
+```
+after enum preamble

@@ -1,0 +1,12 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+function preamble
+```rust
+#use std::fmt;
+fn free_function() {
+    println!("Hello, world! \\{");
+}
+```
+after function preamble

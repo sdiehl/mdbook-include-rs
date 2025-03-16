@@ -1,0 +1,24 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+impl preamble
+```rust
+#use std::fmt;
+#struct TestStruct {
+#    name: String,
+#    value: i32,
+#}
+impl TestStruct {
+    fn new(name: &str, value: i32) -> Self {
+        Self {
+            name: name.to_string(),
+            value,
+        }
+    }
+    fn print(&self) {
+        println!("Name: {}, Value: {}", self.name, self.value);
+    }
+}
+```
+after impl preamble

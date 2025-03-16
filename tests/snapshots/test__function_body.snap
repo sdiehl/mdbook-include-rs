@@ -1,0 +1,10 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+some preamble
+```rust
+#use std::fmt;
+println!("Hello, world! \\{");
+```
+after some preamble

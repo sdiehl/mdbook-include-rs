@@ -1,0 +1,15 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+trait preamble
+```rust
+#use std::fmt;
+trait TestTrait {
+    fn test_method(&self) -> String;
+    fn default_method(&self) -> i32 {
+        42
+    }
+}
+```
+after trait preamble

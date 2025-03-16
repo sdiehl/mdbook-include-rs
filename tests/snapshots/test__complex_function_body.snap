@@ -1,0 +1,30 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+some preamble
+```rust
+#use std::fmt;
+struct TestStruct {
+    name: String,
+    value: i32,
+}
+trait TestTrait {
+    fn test_method(&self) -> String;
+    fn default_method(&self) -> i32 {
+        42
+    }
+}
+impl TestTrait for TestStruct {
+    fn test_method(&self) -> String {
+        format!("TestStruct: {}", self.name)
+    }
+}
+enum TestEnum {
+    A,
+    B(i32),
+    C { name: String },
+}
+println!("Name: {}, Value: {}", self.name, self.value);
+```
+after some preamble

@@ -1,0 +1,13 @@
+---
+source: tests/test.rs
+expression: processed_content
+---
+struct preamble
+```rust
+#use std::fmt;
+struct TestStruct {
+    name: String,
+    value: i32,
+}
+```
+after struct preamble
