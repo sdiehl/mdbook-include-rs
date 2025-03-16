@@ -1,6 +1,6 @@
 use std::fmt;
-fn hello_world() {
-    println!("Hello, world!");
+fn free_function() {
+    println!("Hello, world! \\{");
 }
 
 struct TestStruct {

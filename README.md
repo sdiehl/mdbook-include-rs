@@ -48,9 +48,9 @@ To include an entire source file:
 
 This will include the entire contents of the file, with `use` statements automatically filtered out for cleaner output.
 
-### Include Just a Function Body
+### Include a Function Body
 
-To include just the body of a specific function (without the function declaration):
+To focus on the body of a specific function while keeping the code runnable:
 
 ````markdown
 ```rust
@@ -58,7 +58,10 @@ To include just the body of a specific function (without the function declaratio
 ```
 ````
 
-The output will only contain the content inside the function body, not the function declaration itself.
+The output will show the function body with its declaration commented out, which:
+1. Maintains the focus on the function body
+2. Preserves the code structure to make it runnable in mdBook
+3. Shows the context of the function signature for reference
 
 ### Include a Function with Dependencies
 
@@ -66,7 +69,7 @@ If your function depends on other types or functions, you can include them too:
 
 ````markdown
 ```rust
-#![function_body!("src/models.rs", User::display_profile, [struct User, trait Displayable, impl Displayable for User])]
+#![function_body!("src/models.rs", User::display_profile, [struct User, trait Displayable, impl Displayable for User, enum Account])]
 ```
 ````
 
@@ -75,6 +78,7 @@ This will include:
 2. The `Displayable` trait definition
 3. The implementation of `Displayable` for `User`
 4. And finally, the body of the `display_profile` method
+5. All other code in the file will remain, but each line will begin with `#`. This will allow it to remain runnable in mdBook.
 
 The dependencies will be included in the order you list them, with the main function's body appearing last.
 
