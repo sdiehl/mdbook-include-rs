@@ -153,13 +153,13 @@ For a document explaining user authentication:
 Our system handles authentication with a simple API:
 
 ```rust
-{{#function_body!("src/auth.rs", authenticate_user, [struct Credentials, struct User, fn validate_password])}}
+#![function_body!("src/auth.rs", authenticate_user, [struct Credentials, struct User, fn validate_password])]
 ```
 
 Behind the scenes, password hashing works like this:
 
 ```rust
-{{#function_body!("src/auth.rs", hash_password)}}
+#![function_body!("src/auth.rs", hash_password)]
 ```
 ````
 
