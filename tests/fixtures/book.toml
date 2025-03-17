@@ -3,4 +3,4 @@ title = "Test Book"
 authors = ["Test Author"]
 src = "src"
 
-[preprocessor.include-doc]
+[preprocessor.include-rs]

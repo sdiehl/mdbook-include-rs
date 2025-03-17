@@ -6,7 +6,7 @@ use std::io;
 use std::path::PathBuf;
 use std::process;
 
-/// An mdBook preprocessor that integrates with include-doc to render external source files
+/// An mdBook preprocessor that renders portions of external source files
 #[derive(Parser)]
 #[command(author, version, about)]
 struct Cli {

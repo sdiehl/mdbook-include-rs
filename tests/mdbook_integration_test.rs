@@ -37,7 +37,7 @@ fn test_preprocessor_with_complete_mdbook() {
 
     // The HTML should not contain the original directive
     assert!(
-        !html_output.contains("{{ #function_body!"),
+        !html_output.contains("#![function_body!"),
         "HTML output still contains the original directive"
     );
 
@@ -52,7 +52,7 @@ fn test_preprocessor_with_complete_mdbook() {
 
     // The HTML should not contain the original directive
     assert!(
-        !html_output2.contains("{{ #source_file!"),
+        !html_output2.contains("#![source_file!"),
         "HTML output still contains the original directive"
     );
 }

@@ -13,7 +13,7 @@ use std::path::Path;
 use syn::token::{Enum, Impl, Struct, Trait};
 use syn::{File, Item, ItemFn};
 
-/// Process the markdown content to find and replace include-doc code blocks
+/// Process the markdown content to find and replace include-rs directives
 pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
     // This regex finds our directives anywhere in the content
     let re = Regex::new(
@@ -24,11 +24,11 @@ pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
         let include_doc_directive = caps.get(1).map_or("", |m| m.as_str());
 
         // Process the directive with include_doc_macro
-        match process_include_doc_directive(base_dir, include_doc_directive) {
+        match process_include_rs_directive(base_dir, include_doc_directive) {
             Ok(processed) => processed,
             Err(e) => {
-                eprintln!("Error processing include-doc directive: {}", e);
-                format!("Error processing include-doc directive: {}", e)
+                eprintln!("Error processing include-rs directive: {}", e);
+                format!("Error processing include-rs directive: {}", e)
             }
         }
     });
@@ -37,8 +37,8 @@ pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
     Ok(())
 }
 
-/// Process an include-doc directive
-fn process_include_doc_directive(base_dir: &Path, directive: &str) -> Result<String> {
+/// Process an include-rs directive
+fn process_include_rs_directive(base_dir: &Path, directive: &str) -> Result<String> {
     // Parse the directive name
     let directive_name = if let Some(pos) = directive.find('!') {
         &directive[0..pos]
