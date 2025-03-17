@@ -9,9 +9,6 @@ pub fn format_item(item: &Item) -> String {
         items: vec![item.clone()],
     };
 
-    // Format the file
-    
-
     // Extract the item part (skip any file-level metadata)
     prettyplease::unparse(&file)
 }
