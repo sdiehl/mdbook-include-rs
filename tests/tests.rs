@@ -194,6 +194,42 @@ fn test_relative_path_with_source_path() {
     );
 }
 
+#[test]
+fn test_error_message_includes_line_and_column() {
+    // Create a test book with a deliberately invalid directive 
+    // (non-existent file path)
+    let content = "\
+First line
+Second line
+Third line with an invalid directive:
+#![function!(\"non_existent_file.rs\", non_existent_function)]
+Fifth line";
+    
+    let book = create_test_book("Error Test Chapter", content, "error_chapter.md");
+    
+    // Create a preprocessor context
+    let ctx = create_test_context();
+    
+    // Run the preprocessor
+    let preprocessor = IncludeRsPreprocessor;
+    let processed_book = preprocessor.run(&ctx, book).unwrap();
+    
+    // Find the processed chapter
+    let mut processed_content = String::new();
+    for item in processed_book.iter() {
+        if let BookItem::Chapter(chapter) = item {
+            if chapter.name == "Error Test Chapter" {
+                processed_content = chapter.content.clone();
+                break;
+            }
+        }
+    }
+    
+    // The error message should include line and column information
+    assert!(processed_content.contains("4:1:"), 
+            "Error message doesn't contain line and column information");
+}
+
 // Create a mock PreprocessorContext for testing
 fn create_test_context() -> PreprocessorContext {
     let mut config = Config::default();
