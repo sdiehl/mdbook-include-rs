@@ -78,7 +78,7 @@ fn find_line_and_col(line_positions: &[usize], position: usize) -> (usize, usize
 fn get_relative_path(path: &Path) -> String {
     if let Ok(current_dir) = env::current_dir() {
         if let Ok(relative) = path.strip_prefix(&current_dir) {
-            return format!(".{}{}", std::path::MAIN_SEPARATOR, relative.to_string_lossy().to_string());
+            return format!(".{}{}.md", std::path::MAIN_SEPARATOR, relative.to_string_lossy().to_string());
         }
     }
     
