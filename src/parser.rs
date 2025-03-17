@@ -15,7 +15,7 @@ use syn::token::{Enum, Impl, Struct, Trait};
 use syn::{File, Item, ItemFn};
 
 /// Process the markdown content to find and replace include-rs directives
-pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
+pub fn process_markdown(base_dir: &Path, source_path: &Path, content: &mut String) -> Result<()> {
     // This regex finds our directives anywhere in the content
     let re = Regex::new(
         r"(?ms)^#!\[((?:source_file|function|struct|enum|trait|impl|trait_impl|function_body)![\s\S]*?)\]$",
@@ -42,7 +42,7 @@ pub fn process_markdown(base_dir: &Path, content: &mut String) -> Result<()> {
         match process_include_rs_directive(base_dir, include_doc_directive) {
             Ok(processed) => processed,
             Err(e) => {
-                let rel_path = get_relative_path(base_dir);
+                let rel_path = get_relative_path(&source_path);
                 eprintln!("{}:{}:{}: {}", rel_path, line_num, col_num, e);
                 format!("{}:{}:{}: {}", rel_path, line_num, col_num, e)
             }
@@ -75,15 +75,15 @@ fn find_line_and_col(line_positions: &[usize], position: usize) -> (usize, usize
 }
 
 /// Get the path relative to the current working directory
-fn get_relative_path(path: &Path) -> String {
+pub (crate) fn get_relative_path(path: &Path) -> String {
     if let Ok(current_dir) = env::current_dir() {
         if let Ok(relative) = path.strip_prefix(&current_dir) {
-            return format!(".{}{}.md", std::path::MAIN_SEPARATOR, relative.to_string_lossy().to_string());
+            return format!(".{}{}", std::path::MAIN_SEPARATOR, relative.to_string_lossy().to_string());
         }
     }
     
     // Fall back to the original path if we can't get a relative path
-    path.to_string_lossy().to_string()
+    format!(".{}{}", std::path::MAIN_SEPARATOR, path.to_string_lossy().to_string())
 }
 
 /// Process an include-rs directive
