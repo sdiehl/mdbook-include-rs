@@ -42,7 +42,7 @@ pub fn process_markdown(base_dir: &Path, source_path: &Path, content: &mut Strin
         match process_include_rs_directive(base_dir, include_doc_directive) {
             Ok(processed) => processed,
             Err(e) => {
-                let rel_path = get_relative_path(&source_path);
+                let rel_path = get_relative_path(source_path);
                 eprintln!("{}:{}:{}: {}", rel_path, line_num, col_num, e);
                 format!("{}:{}:{}: {}", rel_path, line_num, col_num, e)
             }
@@ -78,12 +78,12 @@ fn find_line_and_col(line_positions: &[usize], position: usize) -> (usize, usize
 pub (crate) fn get_relative_path(path: &Path) -> String {
     if let Ok(current_dir) = env::current_dir() {
         if let Ok(relative) = path.strip_prefix(&current_dir) {
-            return format!(".{}{}", std::path::MAIN_SEPARATOR, relative.to_string_lossy().to_string());
+            return format!(".{}{}", std::path::MAIN_SEPARATOR, relative.to_string_lossy());
         }
     }
     
     // Fall back to the original path if we can't get a relative path
-    format!(".{}{}", std::path::MAIN_SEPARATOR, path.to_string_lossy().to_string())
+    format!(".{}{}", std::path::MAIN_SEPARATOR, path.to_string_lossy())
 }
 
 /// Process an include-rs directive
