@@ -1,9 +1,13 @@
 ---
-source: tests/test.rs
+source: tests/tests.rs
 expression: processed_content
 ---
-function preamble
+trait impl preamble
 ```rust
+#use std::fmt;
+#fn free_function() {
+#    println!("Hello, world! \\{");
+#}
 #struct TestStruct {
 #    name: String,
 #    value: i32,
@@ -30,13 +34,10 @@ function preamble
 #        42
 #    }
 #}
-#impl TestTrait for TestStruct {
-#    fn test_method(&self) -> String {
-#        format!("TestStruct: {}", self.name)
-#    }
-#}
-fn free_function() {
-    println!("Hello, world! \\{");
+impl TestTrait for TestStruct {
+    fn test_method(&self) -> String {
+        format!("TestStruct: {}", self.name)
+    }
 }
 ```
-after function preamble
+after trait impl preamble

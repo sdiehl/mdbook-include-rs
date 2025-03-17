@@ -1,4 +1,3 @@
-use std::fmt;
 fn hello_world() {
     println!("Hello, world!");
 }

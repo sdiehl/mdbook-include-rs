@@ -4,7 +4,6 @@ expression: processed_content
 ---
 relative path preamble
 ```rust
-use std::fmt;
 fn free_function() {
     println!("Hello, world! \\{");
 }

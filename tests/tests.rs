@@ -2,7 +2,7 @@ use insta::assert_snapshot;
 use mdbook::Config;
 use mdbook::book::{Book, BookItem, Chapter};
 use mdbook::preprocess::{Preprocessor, PreprocessorContext};
-use mdbook_include_rs::IncludeDocPreprocessor;
+use mdbook_include_rs::IncludeRsPreprocessor;
 use std::path::PathBuf;
 
 #[test]
@@ -24,7 +24,7 @@ fn test_empty() {
     let ctx = create_test_context();
 
     // Run the preprocessor
-    let preprocessor = IncludeDocPreprocessor;
+    let preprocessor = IncludeRsPreprocessor;
     let processed_book = preprocessor.run(&ctx, book).unwrap();
 
     // Since there are no include-doc snippets, the book should remain unchanged
@@ -62,7 +62,7 @@ fn run_and_extract_content(book: Book, chapter_name: &str) -> String {
     let ctx = create_test_context();
 
     // Run the preprocessor
-    let preprocessor = IncludeDocPreprocessor;
+    let preprocessor = IncludeRsPreprocessor;
     let processed_book = preprocessor.run(&ctx, book).unwrap();
 
     // Extract the processed content
@@ -79,8 +79,16 @@ fn run_and_extract_content(book: Book, chapter_name: &str) -> String {
 }
 
 /// Helper function to run a directive test and perform snapshot testing
-fn test_directive(directive_name: &str, directive_content: &str, chapter_name: &str, preamble: &str) {
-    let content = format!("{}\n```rust\n{}\n```\nafter {}", preamble, directive_content, preamble);
+fn test_directive(
+    directive_name: &str,
+    directive_content: &str,
+    chapter_name: &str,
+    preamble: &str,
+) {
+    let content = format!(
+        "{}\n```rust\n{}\n```\nafter {}",
+        preamble, directive_content, preamble
+    );
     let book = create_test_book(chapter_name, &content, "chapter_1.md");
     let processed_content = run_and_extract_content(book, chapter_name);
     assert_snapshot!(directive_name, processed_content);
@@ -89,100 +97,100 @@ fn test_directive(directive_name: &str, directive_content: &str, chapter_name: &
 #[test]
 fn test_source_file() {
     test_directive(
-        "source_file", 
-        "#![source_file!(\"../test_file.rs\")]", 
-        "Chapter 1", 
-        "Some preamble"
+        "source_file",
+        "#![source_file!(\"../test_file.rs\")]",
+        "Chapter 1",
+        "Some preamble",
     );
 }
 
 #[test]
 fn test_function_body() {
     test_directive(
-        "function_body", 
-        "#![function_body!(\"../test_file.rs\", free_function)]", 
-        "Chapter 1", 
-        "some preamble"
+        "function_body",
+        "#![function_body!(\"../test_file.rs\", free_function)]",
+        "Chapter 1",
+        "some preamble",
     );
 }
 
 #[test]
 fn test_complex_function_body() {
     test_directive(
-        "complex_function_body", 
-        "#![function_body!(\"../test_file.rs\", TestStruct::print, [struct TestStruct, impl TestStruct::new, trait TestTrait, impl TestTrait for TestStruct, enum TestEnum])]",
-        "Chapter 1", 
-        "some preamble"
+        "complex_function_body",
+        "#![function_body!(\"../test_file.rs\", free_function, [struct TestStruct, impl TestStruct, trait TestTrait, impl TestTrait for TestStruct, enum TestEnum])]",
+        "Chapter 1",
+        "some preamble",
     );
 }
 
 #[test]
 fn test_struct() {
     test_directive(
-        "struct", 
-        "#![struct!(\"../test_file.rs\", TestStruct)]", 
-        "Chapter 1", 
-        "struct preamble"
+        "struct",
+        "#![struct!(\"../test_file.rs\", TestStruct)]",
+        "Chapter 1",
+        "struct preamble",
     );
 }
 
 #[test]
 fn test_enum() {
     test_directive(
-        "enum", 
-        "#![enum!(\"../test_file.rs\", TestEnum)]", 
-        "Chapter 1", 
-        "enum preamble"
+        "enum",
+        "#![enum!(\"../test_file.rs\", TestEnum)]",
+        "Chapter 1",
+        "enum preamble",
     );
 }
 
 #[test]
 fn test_trait() {
     test_directive(
-        "trait", 
-        "#![trait!(\"../test_file.rs\", TestTrait)]", 
-        "Chapter 1", 
-        "trait preamble"
+        "trait",
+        "#![trait!(\"../test_file.rs\", TestTrait)]",
+        "Chapter 1",
+        "trait preamble",
     );
 }
 
 #[test]
 fn test_impl() {
     test_directive(
-        "impl", 
-        "#![impl!(\"../test_file.rs\", TestStruct)]", 
-        "Chapter 1", 
-        "impl preamble"
+        "impl",
+        "#![impl!(\"../test_file.rs\", TestStruct)]",
+        "Chapter 1",
+        "impl preamble",
     );
 }
 
 #[test]
 fn test_trait_impl() {
     test_directive(
-        "trait_impl", 
+        "trait_impl",
         "#![trait_impl!(\"../test_file.rs\", TestTrait for TestStruct)]",
-        "Chapter 1", 
-        "trait impl preamble"
+        "Chapter 1",
+        "trait impl preamble",
     );
 }
 
 #[test]
 fn test_function() {
     test_directive(
-        "function", 
-        "#![function!(\"../test_file.rs\", free_function)]", 
-        "Chapter 1", 
-        "function preamble"
+        "function",
+        "#![function!(\"../test_file.rs\", free_function)]",
+        "Chapter 1",
+        "function preamble",
     );
 }
 
 #[test]
 fn test_relative_path_with_source_path() {
     test_directive(
-        "relative_path", 
-        "#![source_file!(\"../test_file.rs\")]", 
-        "Relative Path Test", 
-        "relative path preamble"
+        "relative_path",
+        "#![source_file!(\"../test_file.rs\")]",
+        "Relative Path Test",
+        "relative path preamble",
     );
 }
 

@@ -1,4 +1,7 @@
-use syn::{File, ItemTrait, visit::{self, Visit}};
+use syn::{
+    File, ItemTrait,
+    visit::{self, Visit},
+};
 
 /// Find a trait in a parsed Rust file
 pub fn find_trait(parsed_file: &File, trait_name: &str) -> Option<ItemTrait> {
@@ -27,7 +30,7 @@ impl<'ast> Visit<'ast> for TraitFinder {
         if item_trait.ident == self.trait_name {
             self.trait_item = Some(item_trait.clone());
         }
-        
+
         // Continue visiting
         visit::visit_item_trait(self, item_trait);
     }

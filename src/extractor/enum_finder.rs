@@ -1,14 +1,17 @@
-use syn::{File, ItemEnum, visit::{self, Visit}};
+use syn::{
+    File, ItemEnum,
+    visit::{self, Visit},
+};
 
 /// Find an enum in a parsed Rust file
-pub fn find_enum(parsed_file: &File, enum_name: &str) -> Option<ItemEnum> {
+pub(crate) fn find_enum(parsed_file: &File, enum_name: &str) -> Option<ItemEnum> {
     let mut finder = EnumFinder::new(enum_name);
     finder.visit_file(parsed_file);
     finder.enum_item
 }
 
 /// A visitor that finds an enum by name
-pub struct EnumFinder {
+struct EnumFinder {
     enum_name: String,
     enum_item: Option<ItemEnum>,
 }
@@ -27,7 +30,7 @@ impl<'ast> Visit<'ast> for EnumFinder {
         if item_enum.ident == self.enum_name {
             self.enum_item = Some(item_enum.clone());
         }
-        
+
         // Continue visiting
         visit::visit_item_enum(self, item_enum);
     }

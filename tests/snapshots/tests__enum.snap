@@ -1,9 +1,13 @@
 ---
-source: tests/test.rs
+source: tests/tests.rs
 expression: processed_content
 ---
-function preamble
+enum preamble
 ```rust
+#use std::fmt;
+#fn free_function() {
+#    println!("Hello, world! \\{");
+#}
 #struct TestStruct {
 #    name: String,
 #    value: i32,
@@ -19,11 +23,6 @@ function preamble
 #        println!("Name: {}, Value: {}", self.name, self.value);
 #    }
 #}
-#enum TestEnum {
-#    A,
-#    B(i32),
-#    C { name: String },
-#}
 #trait TestTrait {
 #    fn test_method(&self) -> String;
 #    fn default_method(&self) -> i32 {
@@ -35,8 +34,10 @@ function preamble
 #        format!("TestStruct: {}", self.name)
 #    }
 #}
-fn free_function() {
-    println!("Hello, world! \\{");
+enum TestEnum {
+    A,
+    B(i32),
+    C { name: String },
 }
 ```
-after function preamble
+after enum preamble

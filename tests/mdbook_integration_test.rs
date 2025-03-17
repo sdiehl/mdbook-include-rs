@@ -1,5 +1,5 @@
 use mdbook::MDBook;
-use mdbook_include_rs::IncludeDocPreprocessor;
+use mdbook_include_rs::IncludeRsPreprocessor;
 use std::fs;
 use std::path::Path;
 
@@ -21,7 +21,7 @@ fn test_preprocessor_with_complete_mdbook() {
     let mut mdbook = MDBook::load(&book_dir).unwrap();
 
     // Register our preprocessor
-    mdbook.with_preprocessor(IncludeDocPreprocessor);
+    mdbook.with_preprocessor(IncludeRsPreprocessor);
 
     // Build the book
     mdbook.build().unwrap();

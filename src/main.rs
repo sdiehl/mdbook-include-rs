@@ -1,7 +1,7 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
 use mdbook::preprocess::{CmdPreprocessor, Preprocessor};
-use mdbook_include_rs::IncludeDocPreprocessor;
+use mdbook_include_rs::IncludeRsPreprocessor;
 use std::io;
 use std::path::PathBuf;
 use std::process;
@@ -32,7 +32,7 @@ enum Commands {
 
 fn main() -> Result<()> {
     let args = Cli::parse();
-    let preprocessor = IncludeDocPreprocessor;
+    let preprocessor = IncludeRsPreprocessor;
 
     match args.command {
         Some(Commands::Supports { renderer }) => {

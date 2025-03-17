@@ -6,9 +6,9 @@ use toml::Value;
 use crate::parser::process_markdown;
 
 /// Preprocessor that handles include-rs code blocks
-pub struct IncludeDocPreprocessor;
+pub struct IncludeRsPreprocessor;
 
-impl Preprocessor for IncludeDocPreprocessor {
+impl Preprocessor for IncludeRsPreprocessor {
     fn name(&self) -> &str {
         "include-rs"
     }

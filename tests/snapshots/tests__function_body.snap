@@ -1,9 +1,10 @@
 ---
-source: tests/test.rs
+source: tests/tests.rs
 expression: processed_content
 ---
-function preamble
+some preamble
 ```rust
+#use std::fmt;
 #struct TestStruct {
 #    name: String,
 #    value: i32,
@@ -35,8 +36,6 @@ function preamble
 #        format!("TestStruct: {}", self.name)
 #    }
 #}
-fn free_function() {
-    println!("Hello, world! \\{");
-}
+println!("Hello, world! \\{");
 ```
-after function preamble
+after some preamble

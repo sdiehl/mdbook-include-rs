@@ -1,9 +1,10 @@
 ---
-source: tests/test.rs
+source: tests/tests.rs
 expression: processed_content
 ---
-Some preamble
+relative path preamble
 ```rust
+use std::fmt;
 fn free_function() {
     println!("Hello, world! \\{");
 }
@@ -39,4 +40,4 @@ impl TestTrait for TestStruct {
     }
 }
 ```
-after Some preamble
+after relative path preamble

@@ -1,4 +1,4 @@
-use syn::{Block, File, Item, ItemEnum, ItemFn, ItemImpl, ItemStruct, ItemTrait};
+use syn::{File, Item};
 
 /// Format an item as a string
 pub fn format_item(item: &Item) -> String {
@@ -8,61 +8,40 @@ pub fn format_item(item: &Item) -> String {
         attrs: vec![],
         items: vec![item.clone()],
     };
-    
+
     // Format the file
-    let formatted = prettyplease::unparse(&file);
     
+
     // Extract the item part (skip any file-level metadata)
-    formatted
-}
-
-/// Format a struct item as a string
-pub fn format_struct(item: &ItemStruct) -> String {
-    format_item(&Item::Struct(item.clone()))
-}
-
-/// Format an enum item as a string
-pub fn format_enum(item: &ItemEnum) -> String {
-    format_item(&Item::Enum(item.clone()))
-}
-
-/// Format a trait item as a string
-pub fn format_trait(item: &ItemTrait) -> String {
-    format_item(&Item::Trait(item.clone()))
-}
-
-/// Format an impl item as a string
-pub fn format_impl(item: &ItemImpl) -> String {
-    format_item(&Item::Impl(item.clone()))
-}
-
-/// Format a function item as a string
-pub fn format_function(item: &ItemFn) -> String {
-    format_item(&Item::Fn(item.clone()))
+    prettyplease::unparse(&file)
 }
 
 /// Format a function body (the contents between { }) as a string
-pub fn format_function_body(block_content: &Block) -> String {
-    let file = syn::File {
-        shebang: None,
-        attrs: vec![],
-        items: vec![syn::parse_quote! {
-            fn tmp() #block_content
+pub fn format_function_body(fn_item: &Item) -> String {
+    if let Item::Fn(fn_def) = fn_item {
+        let block_content = &fn_def.block;
+        let file = syn::File {
+            shebang: None,
+            attrs: vec![],
+            items: vec![syn::parse_quote! {
+                fn tmp() #block_content
 
-        }],
-    };
+            }],
+        };
 
-    // Format the file
-    let formatted = prettyplease::unparse(&file);
-    let mut lines = formatted.lines().collect::<Vec<_>>();
-    lines.remove(0);
-    lines.remove(lines.len() - 1);
-    // Remove the `    ` from the start of each line
-    for i in 0..lines.len() {
-        lines[i] = &lines[i][4..];
+        // Format the file
+        let formatted = prettyplease::unparse(&file);
+        let mut lines = formatted.lines().collect::<Vec<_>>();
+        lines.remove(0);
+        lines.remove(lines.len() - 1);
+        // Remove the `    ` from the start of each line
+        for line in &mut lines {
+            *line = &line[4..];
+        }
+        lines.join("\n")
+    } else {
+        panic!("Expected Item::Fn, got {:?}", fn_item);
     }
-    lines.join("\n")
-
 }
 
 /// Format content with a # prefix for hidden code
