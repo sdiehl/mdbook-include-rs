@@ -29,6 +29,9 @@ pub fn format_function_body(fn_item: &Item) -> String {
         // Format the file
         let formatted = prettyplease::unparse(&file);
         let mut lines = formatted.lines().collect::<Vec<_>>();
+        if lines.len() == 1 {
+            return String::new();
+        }
         lines.remove(0);
         lines.remove(lines.len() - 1);
         // Remove the `    ` from the start of each line
@@ -46,9 +49,9 @@ pub fn format_hidden(content: &str) -> String {
     let mut result = String::new();
     for line in content.lines() {
         if line.trim().is_empty() {
-            result.push_str("#\n");
+            result.push_str("# \n");
         } else {
-            result.push_str(&format!("#{}\n", line));
+            result.push_str(&format!("# {}\n", line));
         }
     }
     result
