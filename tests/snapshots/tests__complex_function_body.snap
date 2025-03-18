@@ -4,7 +4,7 @@ expression: processed_content
 ---
 some preamble
 ```rust
-#use std::fmt;
+# use std::fmt;
 struct TestStruct {
     name: String,
     value: i32,
@@ -36,6 +36,8 @@ enum TestEnum {
     B(i32),
     C { name: String },
 }
+# fn main() {
 println!("Hello, world! \\{");
+# }
 ```
 after some preamble

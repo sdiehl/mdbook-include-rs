@@ -230,6 +230,46 @@ Fifth line";
             "Error message doesn't contain line and column information");
 }
 
+#[test]
+fn test_function_body_with_display_markers() {
+    test_directive(
+        "function_body_with_display_markers",
+        "#![function_body!(\"../test_file_with_display_comments.rs\", function_with_display_markers)]",
+        "Chapter 1",
+        "Function with display markers",
+    );
+}
+
+#[test]
+fn test_function_body_with_display_start_only() {
+    test_directive(
+        "function_body_with_display_start_only",
+        "#![function_body!(\"../test_file_with_display_comments.rs\", function_with_display_start_only)]",
+        "Chapter 1",
+        "Function with display start only",
+    );
+}
+
+#[test]
+fn test_function_body_with_display_end_only() {
+    test_directive(
+        "function_body_with_display_end_only",
+        "#![function_body!(\"../test_file_with_display_comments.rs\", function_with_display_end_only)]",
+        "Chapter 1",
+        "Function with display end only",
+    );
+}
+
+#[test]
+fn test_function_body_without_markers() {
+    test_directive(
+        "function_body_without_markers",
+        "#![function_body!(\"../test_file_with_display_comments.rs\", function_without_markers)]",
+        "Chapter 1",
+        "Function without markers",
+    );
+}
+
 // Create a mock PreprocessorContext for testing
 fn create_test_context() -> PreprocessorContext {
     let mut config = Config::default();

@@ -1,0 +1,38 @@
+---
+source: tests/tests.rs
+expression: processed_content
+---
+Function with display end only
+```rust
+# use std::fmt;
+# fn function_with_display_markers() {
+#     let x = 10;
+#     let y = 20;
+#     let result = x + y;
+#     println!("Result: {}", result);
+#     println!("Done!");
+# }
+# fn function_with_display_start_only() {
+#     let name = "World";
+#     println!("Hello, {}!", name);
+#     let message = format!("Welcome to Rust");
+#     println!("{}", message);
+# }
+# fn function_without_markers() {
+#     let a = 5;
+#     let b = 7;
+#     let sum = a + b;
+#     println!("{} + {} = {}", a, b, sum);
+# }
+# fn main() {
+// Everything until the end marker should be visible
+println!("This is visible");
+let calculation = 42;
+println!("The answer is: {}", calculation);
+
+# // DISPLAY END
+# // This is hidden
+# println!("Cleanup operations");
+# }
+```
+after Function with display end only

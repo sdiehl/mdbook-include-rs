@@ -4,30 +4,30 @@ expression: processed_content
 ---
 impl preamble
 ```rust
-#use std::fmt;
-#fn free_function() {
-#    println!("Hello, world! \\{");
-#}
-#struct TestStruct {
-#    name: String,
-#    value: i32,
-#}
-#enum TestEnum {
-#    A,
-#    B(i32),
-#    C { name: String },
-#}
-#trait TestTrait {
-#    fn test_method(&self) -> String;
-#    fn default_method(&self) -> i32 {
-#        42
-#    }
-#}
-#impl TestTrait for TestStruct {
-#    fn test_method(&self) -> String {
-#        format!("TestStruct: {}", self.name)
-#    }
-#}
+# use std::fmt;
+# fn free_function() {
+#     println!("Hello, world! \\{");
+# }
+# struct TestStruct {
+#     name: String,
+#     value: i32,
+# }
+# enum TestEnum {
+#     A,
+#     B(i32),
+#     C { name: String },
+# }
+# trait TestTrait {
+#     fn test_method(&self) -> String;
+#     fn default_method(&self) -> i32 {
+#         42
+#     }
+# }
+# impl TestTrait for TestStruct {
+#     fn test_method(&self) -> String {
+#         format!("TestStruct: {}", self.name)
+#     }
+# }
 impl TestStruct {
     fn new(name: &str, value: i32) -> Self {
         Self {

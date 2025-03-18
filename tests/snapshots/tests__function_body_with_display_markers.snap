@@ -1,0 +1,41 @@
+---
+source: tests/tests.rs
+expression: processed_content
+---
+Function with display markers
+```rust
+# use std::fmt;
+# fn function_with_display_start_only() {
+#     let name = "World";
+#     println!("Hello, {}!", name);
+#     let message = format!("Welcome to Rust");
+#     println!("{}", message);
+# }
+# fn function_with_display_end_only() {
+#     println!("This is visible");
+#     let calculation = 42;
+#     println!("The answer is: {}", calculation);
+#     println!("Cleanup operations");
+# }
+# fn function_without_markers() {
+#     let a = 5;
+#     let b = 7;
+#     let sum = a + b;
+#     println!("{} + {} = {}", a, b, sum);
+# }
+# fn main() {
+# // Setup code that shouldn't be displayed
+# let x = 10;
+# let y = 20;
+#
+# // DISPLAY START
+// This part should be visible
+let result = x + y;
+println!("Result: {}", result);
+# // DISPLAY END
+#
+# // Cleanup code that shouldn't be displayed
+# println!("Done!");
+# }
+```
+after Function with display markers
