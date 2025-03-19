@@ -205,9 +205,8 @@ The preprocessor:
 
 1. Parses your markdown looking for code blocks with directives
 2. Uses Rust's `syn` library to parse and extract the requested code elements
-3. Formats the extracted code with proper syntax highlighting
-4. Processes display markers to show only the relevant code sections
-5. Replaces the directive in your markdown with the extracted code
+3. Processes display markers to show only the relevant code sections
+4. Replaces the directive in your markdown with the extracted code
 
 ## Command Line Interface
 
