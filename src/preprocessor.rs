@@ -46,7 +46,12 @@ impl Preprocessor for IncludeRsPreprocessor {
                     src_dir.clone()
                 };
 
-                let source_path = src_dir.join(chapter.source_path.clone().unwrap_or_else(|| "SUMMARY.md".into()));
+                let source_path = src_dir.join(
+                    chapter
+                        .source_path
+                        .clone()
+                        .unwrap_or_else(|| "SUMMARY.md".into()),
+                );
 
                 if let Err(e) = process_markdown(&base_dir, &source_path, &mut chapter.content) {
                     eprintln!("Error processing chapter '{}': {}", chapter.name, e);

@@ -163,6 +163,42 @@ Behind the scenes, password hashing works like this:
 ```
 ````
 
+## Display Markers
+
+You can further control which parts of included code appear in your documentation using display markers:
+
+````markdown
+```rust
+#![function_body!("src/example.rs", my_function)]
+```
+````
+
+Within your Rust files, add comment markers to hide parts of the code:
+
+```rust
+fn my_function() {
+    // Setup code
+    let config = setup_config();
+    
+    // DISPLAY START
+    // This part will be shown in documentation
+    let result = perform_calculation(config);
+    println!("The result is: {}", result);
+    // DISPLAY END
+    
+    // Cleanup code
+    cleanup_resources();
+}
+```
+
+- Code before `// DISPLAY START` will be hidden (commented with `#`)
+- Code after `// DISPLAY END` will be hidden (commented with `#`)
+- Only the content between the markers will be displayed normally
+- The markers themselves are removed from the output
+- Markers are optional - you can use just one or both
+
+This gives you fine-grained control over which parts of your code examples get shown in documentation while keeping the full context for compilation.
+
 ## How It Works
 
 The preprocessor:
@@ -170,7 +206,8 @@ The preprocessor:
 1. Parses your markdown looking for code blocks with directives
 2. Uses Rust's `syn` library to parse and extract the requested code elements
 3. Formats the extracted code with proper syntax highlighting
-4. Replaces the directive in your markdown with the extracted code
+4. Processes display markers to show only the relevant code sections
+5. Replaces the directive in your markdown with the extracted code
 
 ## Command Line Interface
 

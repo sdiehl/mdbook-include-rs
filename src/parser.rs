@@ -5,12 +5,12 @@ use crate::extractor::impl_finder::{find_struct_impl, find_trait_impl};
 use crate::extractor::read_and_parse_file;
 use crate::extractor::struct_finder::find_struct;
 use crate::extractor::trait_finder::find_trait;
-use crate::formatter::{format_function_body, format_item, format_source_file};
+use crate::formatter::{format_function_body, format_item};
 use crate::output::Output;
 use anyhow::{Context, Result};
 use regex::{Captures, Regex};
-use std::env;
 use std::path::Path;
+use std::{env, fs};
 use syn::token::{Enum, Impl, Struct, Trait};
 use syn::{File, Item, ItemFn};
 
@@ -28,16 +28,16 @@ pub fn process_markdown(base_dir: &Path, source_path: &Path, content: &mut Strin
         line_positions.push(pos);
         pos += line.len() + 1; // +1 for the newline character
     }
-    
+
     let result = re.replace_all(content, |caps: &Captures| {
         let include_doc_directive = caps.get(1).map_or("", |m| m.as_str());
-        
+
         // Get match position information
         let match_start = caps.get(0).map_or(0, |m| m.start());
-        
+
         // Find line number and column based on position
         let (line_num, col_num) = find_line_and_col(&line_positions, match_start);
-        
+
         // Process the directive with include_doc_macro
         match process_include_rs_directive(base_dir, include_doc_directive) {
             Ok(processed) => processed,
@@ -56,7 +56,7 @@ pub fn process_markdown(base_dir: &Path, source_path: &Path, content: &mut Strin
 /// Find line and column number from a position in the text
 fn find_line_and_col(line_positions: &[usize], position: usize) -> (usize, usize) {
     let mut line_idx = 0;
-    
+
     // Find the line containing the position
     for (idx, &start) in line_positions.iter().enumerate() {
         if position >= start {
@@ -65,23 +65,27 @@ fn find_line_and_col(line_positions: &[usize], position: usize) -> (usize, usize
             break;
         }
     }
-    
+
     // Line numbers are 1-indexed
     let line_num = line_idx + 1;
     // Calculate column number (1-indexed)
     let col_num = position - line_positions[line_idx] + 1;
-    
+
     (line_num, col_num)
 }
 
 /// Get the path relative to the current working directory
-pub (crate) fn get_relative_path(path: &Path) -> String {
+pub(crate) fn get_relative_path(path: &Path) -> String {
     if let Ok(current_dir) = env::current_dir() {
         if let Ok(relative) = path.strip_prefix(&current_dir) {
-            return format!(".{}{}", std::path::MAIN_SEPARATOR, relative.to_string_lossy());
+            return format!(
+                ".{}{}",
+                std::path::MAIN_SEPARATOR,
+                relative.to_string_lossy()
+            );
         }
     }
-    
+
     // Fall back to the original path if we can't get a relative path
     format!(".{}{}", std::path::MAIN_SEPARATOR, path.to_string_lossy())
 }
@@ -166,9 +170,9 @@ fn process_include_rs_directive(base_dir: &Path, directive: &str) -> Result<Stri
 fn process_source_file_directive(base_dir: &Path, directive: &str) -> Result<String> {
     let directive = parse_directive_args(directive)?;
     let absolute_path = base_dir.join(directive.file_path);
-    let parsed_file = read_and_parse_file(&absolute_path)?;
-    let formatted_code = format_source_file(&parsed_file);
-    Ok(formatted_code)
+    let content = fs::read_to_string(&absolute_path)
+        .with_context(|| format!("Failed to read file: {}", get_relative_path(&absolute_path)))?;
+    Ok(content)
 }
 
 /// Helper function to process extra items
@@ -255,9 +259,7 @@ fn process_directive<T>(
     let parsed_file = read_and_parse_file(&absolute_path)?;
     let item_name = directive.item.as_ref().expect("item name is required");
     let item = finder(&parsed_file, item_name)
-        .with_context(|| format!("{} '{}' not found",
-                        std::any::type_name::<T>(), 
-                        item_name))?;
+        .with_context(|| format!("{} '{}' not found", std::any::type_name::<T>(), item_name))?;
     let (hidden_deps, visible_deps) = process_extra(&parsed_file, &item, &directive.extra_items);
     let mut result = Output::new();
     for dep in hidden_deps {

@@ -16,6 +16,7 @@ some preamble
 #             value,
 #         }
 #     }
+# 
 #     fn print(&self) {
 #         println!("Name: {}, Value: {}", self.name, self.value);
 #     }

@@ -51,7 +51,8 @@ impl<'ast> Visit<'ast> for StructImplFinder {
             if let Some(path) = self.get_type_path(&item_impl.self_ty) {
                 if path
                     .segments
-                    .last().is_some_and(|seg| seg.ident == self.struct_name)
+                    .last()
+                    .is_some_and(|seg| seg.ident == self.struct_name)
                 {
                     self.impl_item = Some(item_impl.clone());
                 }
@@ -94,12 +95,14 @@ impl<'ast> Visit<'ast> for TraitImplFinder {
         if let Some((_, trait_path, _)) = &item_impl.trait_ {
             if trait_path
                 .segments
-                .last().is_some_and(|seg| seg.ident == self.trait_name)
+                .last()
+                .is_some_and(|seg| seg.ident == self.trait_name)
             {
                 if let Some(path) = self.get_type_path(&item_impl.self_ty) {
                     if path
                         .segments
-                        .last().is_some_and(|seg| seg.ident == self.struct_name)
+                        .last()
+                        .is_some_and(|seg| seg.ident == self.struct_name)
                     {
                         self.impl_item = Some(item_impl.clone());
                     }
