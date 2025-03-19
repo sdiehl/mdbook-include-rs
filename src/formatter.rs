@@ -16,7 +16,7 @@ pub fn format_item(item: &Item) -> String {
 /// * `// DISPLAY START` - This line and any before are prefixed with `# `
 /// * `// DISPLAY END` - This line and any after are prefixed with `# `
 pub(crate) fn format_function_body(fn_item: &Item) -> String {
-    if let Item::Fn(fn_def) = fn_item {
+    if matches!(fn_item, Item::Fn { .. }) {
         let source_text = fn_item
             .span()
             .source_text()
