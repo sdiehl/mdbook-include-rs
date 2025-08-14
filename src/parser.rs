@@ -2,17 +2,18 @@ use crate::directive::parse_directive_args;
 use crate::extractor::enum_finder::find_enum;
 use crate::extractor::function_extractor::find_function;
 use crate::extractor::impl_finder::{find_struct_impl, find_trait_impl};
+use crate::extractor::method_extractor::find_method;
 use crate::extractor::read_and_parse_file;
 use crate::extractor::struct_finder::find_struct;
 use crate::extractor::trait_finder::find_trait;
-use crate::formatter::{format_function_body, format_item};
+use crate::formatter::{format_function_body, format_item, format_method_body};
 use crate::output::Output;
 use anyhow::{Context, Result};
 use regex::{Captures, Regex};
 use std::path::Path;
 use std::{env, fs};
 use syn::token::{Enum, Impl, Struct, Trait};
-use syn::{File, Item, ItemFn};
+use syn::{File, ImplItemFn, Item, ItemFn};
 
 /// Process the markdown content to find and replace include-rs directives
 pub fn process_markdown(base_dir: &Path, source_path: &Path, content: &mut String) -> Result<()> {
@@ -103,12 +104,20 @@ fn process_include_rs_directive(base_dir: &Path, directive: &str) -> Result<Stri
     // Process the directive based on its type
     let result = match directive_name {
         "source_file" => process_source_file_directive(base_dir, directive)?,
-        "function_body" => process_directive::<ItemFn>(
-            base_dir,
-            directive,
-            |f, n| Some(Item::Fn(find_function(f, n)?)),
-            format_function_body,
-        )?,
+        "function_body" => {
+            // Try to find as a regular function first
+            if let Ok(result) = process_directive::<ItemFn>(
+                base_dir,
+                directive,
+                |f, n| Some(Item::Fn(find_function(f, n)?)),
+                format_function_body,
+            ) {
+                result
+            } else {
+                // If not found, try to find as a method
+                process_method_body_directive(base_dir, directive)?
+            }
+        }
         "struct" => process_directive::<Struct>(
             base_dir,
             directive,
@@ -150,12 +159,20 @@ fn process_include_rs_directive(base_dir: &Path, directive: &str) -> Result<Stri
             },
             format_item,
         )?,
-        "function" => process_directive::<ItemFn>(
-            base_dir,
-            directive,
-            |f, n| Some(Item::Fn(find_function(f, n)?)),
-            format_item,
-        )?,
+        "function" => {
+            // Try to find as a regular function first
+            if let Ok(result) = process_directive::<ItemFn>(
+                base_dir,
+                directive,
+                |f, n| Some(Item::Fn(find_function(f, n)?)),
+                format_item,
+            ) {
+                result
+            } else {
+                // If not found, try to find as a method
+                process_method_directive(base_dir, directive)?
+            }
+        }
         _ => {
             // Not a recognized directive
             return Ok(directive.to_string());
@@ -173,6 +190,62 @@ fn process_source_file_directive(base_dir: &Path, directive: &str) -> Result<Str
     let content = fs::read_to_string(&absolute_path)
         .with_context(|| format!("Failed to read file: {}", get_relative_path(&absolute_path)))?;
     Ok(content)
+}
+
+/// Process method_body directive for methods in impl blocks
+fn process_method_body_directive(base_dir: &Path, directive: &str) -> Result<String> {
+    let directive = parse_directive_args(directive)?;
+    if directive.item.is_none() {
+        return Err(anyhow::anyhow!("Method specification is required"));
+    }
+    let absolute_path = base_dir.join(directive.file_path);
+    let parsed_file = read_and_parse_file(&absolute_path)?;
+    let method_spec = directive.item.as_ref().expect("method spec is required");
+    let method = find_method(&parsed_file, method_spec)
+        .with_context(|| format!("Method '{}' not found", method_spec))?;
+
+    // Process extra dependencies if provided
+    let (hidden_deps, visible_deps) =
+        process_extra_for_method(&parsed_file, &method, &directive.extra_items);
+    let mut result = Output::new();
+    for dep in hidden_deps {
+        result.add_hidden_content(format_item(&dep));
+    }
+    for dep in visible_deps {
+        result.add_visible_content(format_item(&dep));
+    }
+
+    result.add_visible_content(format_method_body(&method));
+    Ok(result.format())
+}
+
+/// Process method directive for methods in impl blocks (complete method including signature)
+fn process_method_directive(base_dir: &Path, directive: &str) -> Result<String> {
+    let directive = parse_directive_args(directive)?;
+    if directive.item.is_none() {
+        return Err(anyhow::anyhow!("Method specification is required"));
+    }
+    let absolute_path = base_dir.join(directive.file_path);
+    let parsed_file = read_and_parse_file(&absolute_path)?;
+    let method_spec = directive.item.as_ref().expect("method spec is required");
+    let method = find_method(&parsed_file, method_spec)
+        .with_context(|| format!("Method '{}' not found", method_spec))?;
+
+    // Process extra dependencies if provided
+    let (hidden_deps, visible_deps) =
+        process_extra_for_method(&parsed_file, &method, &directive.extra_items);
+    let mut result = Output::new();
+    for dep in hidden_deps {
+        result.add_hidden_content(format_item(&dep));
+    }
+    for dep in visible_deps {
+        result.add_visible_content(format_item(&dep));
+    }
+
+    // Use the method formatter to show the complete method signature and body
+    use crate::formatter::format_method;
+    result.add_visible_content(format_method(&method));
+    Ok(result.format())
 }
 
 /// Helper function to process extra items
@@ -237,6 +310,65 @@ fn process_extra(
             hidden.push(item.clone());
         }
     }
+
+    (hidden, visible)
+}
+
+/// Helper function to process extra items for methods - simplified version
+fn process_extra_for_method(
+    parsed_file: &File,
+    _method: &ImplItemFn,
+    extra_items: &[String],
+) -> (Vec<Item>, Vec<Item>) {
+    let hidden = Vec::new();
+    let mut visible = Vec::new();
+
+    for item in extra_items {
+        if item.starts_with("struct ") {
+            let struct_name = item.trim_start_matches("struct ").trim();
+            if let Some(struct_def) = find_struct(parsed_file, struct_name) {
+                visible.push(Item::Struct(struct_def));
+            }
+        } else if item.starts_with("enum ") {
+            let enum_name = item.trim_start_matches("enum ").trim();
+            if let Some(enum_def) = find_enum(parsed_file, enum_name) {
+                visible.push(Item::Enum(enum_def));
+            }
+        } else if item.starts_with("trait ") {
+            let trait_name = item.trim_start_matches("trait ").trim();
+            if let Some(trait_def) = find_trait(parsed_file, trait_name) {
+                visible.push(Item::Trait(trait_def));
+            }
+        } else if item.starts_with("impl ") {
+            if item.contains(" for ") {
+                // Trait implementation for a struct
+                let parts: Vec<&str> = item.trim_start_matches("impl ").split(" for ").collect();
+                if parts.len() == 2 {
+                    let trait_name = parts[0].trim();
+                    let struct_name = parts[1].trim();
+                    if let Some(impl_def) = find_trait_impl(parsed_file, trait_name, struct_name) {
+                        visible.push(Item::Impl(impl_def));
+                    }
+                }
+            } else {
+                // Struct implementation
+                let struct_name = item.trim_start_matches("impl ").trim();
+                if let Some(impl_def) = find_struct_impl(parsed_file, struct_name) {
+                    visible.push(Item::Impl(impl_def));
+                }
+            }
+        } else {
+            // Assume it's a struct or enum
+            if let Some(struct_def) = find_struct(parsed_file, item) {
+                visible.push(Item::Struct(struct_def));
+            } else if let Some(enum_def) = find_enum(parsed_file, item) {
+                visible.push(Item::Enum(enum_def));
+            }
+        }
+    }
+
+    // For methods, we don't add all other items as hidden by default
+    // since the method is part of an impl block
 
     (hidden, visible)
 }
