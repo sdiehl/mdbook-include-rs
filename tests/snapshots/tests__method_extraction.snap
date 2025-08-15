@@ -1,0 +1,15 @@
+---
+source: tests/tests.rs
+assertion_line: 94
+expression: processed_content
+---
+Method extraction test
+```rust
+fn new(name: &str, value: i32) -> Self {
+    Self {
+        name: name.to_string(),
+        value,
+    }
+}
+```
+after Method extraction test

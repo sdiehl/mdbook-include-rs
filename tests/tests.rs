@@ -272,6 +272,16 @@ fn test_function_body_without_markers() {
     );
 }
 
+#[test]
+fn test_method_extraction() {
+    test_directive(
+        "method_extraction",
+        "#![function!(\"../test_file.rs\", TestStruct::new)]",
+        "Chapter 1",
+        "Method extraction test",
+    );
+}
+
 // Create a mock PreprocessorContext for testing
 fn create_test_context() -> PreprocessorContext {
     let mut config = Config::default();

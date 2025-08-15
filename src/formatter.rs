@@ -2,15 +2,18 @@ use syn::spanned::Spanned;
 use syn::{ImplItemFn, Item};
 
 /// Remove common leading whitespace from all lines (similar to Python's textwrap.dedent)
+/// For method/function extraction, we skip the first line when calculating minimum indentation
+/// since the function signature should align to the left margin
 fn dedent(text: &str) -> String {
     let lines: Vec<&str> = text.lines().collect();
     if lines.is_empty() {
         return String::new();
     }
 
-    // Find the minimum indentation of non-empty lines
+    // Find the minimum indentation of non-empty lines, excluding the first line
     let min_indent = lines
         .iter()
+        .skip(1) // Skip first line (function signature)
         .filter(|line| !line.trim().is_empty()) // Skip empty lines
         .map(|line| line.len() - line.trim_start().len()) // Count leading whitespace
         .min()
@@ -19,9 +22,13 @@ fn dedent(text: &str) -> String {
     // Remove the common indentation from all lines
     lines
         .iter()
-        .map(|line| {
+        .enumerate()
+        .map(|(i, line)| {
             if line.trim().is_empty() {
                 String::new() // Keep empty lines as empty
+            } else if i == 0 {
+                // Keep first line as-is (function signature)
+                line.to_string()
             } else if line.len() >= min_indent {
                 line[min_indent..].to_string()
             } else {
