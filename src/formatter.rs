@@ -1,12 +1,44 @@
 use syn::spanned::Spanned;
 use syn::{ImplItemFn, Item};
 
+/// Remove common leading whitespace from all lines (similar to Python's textwrap.dedent)
+fn dedent(text: &str) -> String {
+    let lines: Vec<&str> = text.lines().collect();
+    if lines.is_empty() {
+        return String::new();
+    }
+
+    // Find the minimum indentation of non-empty lines
+    let min_indent = lines
+        .iter()
+        .filter(|line| !line.trim().is_empty()) // Skip empty lines
+        .map(|line| line.len() - line.trim_start().len()) // Count leading whitespace
+        .min()
+        .unwrap_or(0);
+
+    // Remove the common indentation from all lines
+    lines
+        .iter()
+        .map(|line| {
+            if line.trim().is_empty() {
+                String::new() // Keep empty lines as empty
+            } else if line.len() >= min_indent {
+                line[min_indent..].to_string()
+            } else {
+                line.to_string()
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("\n")
+}
+
 /// Format an item as a string
 pub fn format_item(item: &Item) -> String {
-    // Create a file with just this item
-    item.span()
+    let source_text = item
+        .span()
         .source_text()
-        .expect("Failed to get source text")
+        .expect("Failed to get source text");
+    dedent(&source_text)
 }
 
 /// Format a function body as a string
@@ -105,10 +137,11 @@ pub fn format_visible(content: &str) -> String {
 
 /// Format a method as a string
 pub fn format_method(method: &ImplItemFn) -> String {
-    method
+    let source_text = method
         .span()
         .source_text()
-        .expect("Failed to get source text")
+        .expect("Failed to get source text");
+    dedent(&source_text)
 }
 
 /// Format a method body as a string, similar to format_function_body
